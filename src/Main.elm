@@ -12,9 +12,12 @@ import Array
 import Array2D
 --elm install elm-community/maybe-extra
 import Maybe.Extra
+import List
+import List
+import List
 
 -- Defines all types of msgs that can be sent to the update function
-type Msg = Increment | Decrement | Increment2 | Decrement2 | AddItem | MaxUp | MaxDown | Reset | Submit | UpdateValue | MagicButton
+type Msg = Increment | Decrement | Increment2 | Decrement2 | AddItem | RemoveItem | MaxUp | MaxDown | Reset | Submit | UpdateValue | MagicButton
 
 -- Converts a list if items to a comma seperated list
 listToString : (List Int) -> String
@@ -150,7 +153,7 @@ state a model=
             , div []
                 [button [onClick AddItem][text "Add Item"]
                 ,text " "
-                ,button [][text "Remove Item"]
+                ,button [onClick RemoveItem][text "Remove Item"]
                 ,text " "
                 ,button [onClick Submit][text "Submit Question"]]
             , div [classes [flex]] [
@@ -236,6 +239,13 @@ update msg model=
         , one = 1
         , two = 1
         }
+    
+    --Removes an item
+    RemoveItem -> 
+        {model | weights = List.drop (List.length(model.weights)) model.weights
+        , values = List.drop (List.length(model.values)) model.values
+        , table =  if List.length(model.table) > 1 then List.reverse(List.drop 1 (List.reverse model.table)) else model.table}
+
     --adds to the max weight value
     MaxUp ->
         {model | maxWeight = adder model.maxWeight}
