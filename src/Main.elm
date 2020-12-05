@@ -241,6 +241,8 @@ update msg model=
         }
     
     --Removes an item
+    --Weights/Values updates the backend list
+    --table updates visual. If/Else stop it from eating the header text
     RemoveItem -> 
         {model | weights = List.drop (List.length(model.weights)) model.weights
         , values = List.drop (List.length(model.values)) model.values
@@ -278,7 +280,10 @@ update msg model=
         , solveTable = solveTableToArray (craeteSolveTable [] (List.length model.values + 1) (model.maxWeight + 1)  ) }
     UpdateValue ->
         --{model | solveTable = Array2D.set (model.i) (model.j) (Maybe.Extra.unwrap 0 (test) (Array2D.get (model.i) (model.w) table))  model.solveTable }
-        {model | solveTable = Array2D.set 2 2 7 model.solveTable } --(Maybe.Extra.unwrap 0 (test) (Array2D.get (i - 1) w table))
+        {model | solveTable = Array2D.set (Tuple.first(model.activeStep)) (Tuple.second(model.activeStep)) 7 model.solveTable  --(Maybe.Extra.unwrap 0 (test) (Array2D.get (i - 1) w table))
+         ,activeStep = if (Tuple.second(model.activeStep) < ((Array2D.columns model.solveTable) - 1)) then (Tuple.pair (Tuple.first(model.activeStep)) (Tuple.second(model.activeStep)+1)) 
+         else if  (Tuple.first(model.activeStep) < ((Array2D.rows model.solveTable) - 1)) then (Tuple.pair (Tuple.first(model.activeStep)+1) 0) 
+         else model.activeStep}
     MagicButton ->
         --todo: make new state var, solved table
         {model | solveTable =  zeroOneBackpack model.solveTable (Array.fromList model.values) (Array.fromList model.weights) model.maxWeight 0 0
@@ -301,6 +306,7 @@ type alias Model =
     , solveTable: Array2D.Array2D Int--solveTable: List(List(Int))
     , i: Int
     , j: Int
+    , activeStep: (Int, Int) --position x,y 
     }
 
 --sets the initial model values
@@ -326,6 +332,7 @@ initModel =
     , solveTable = Array2D.fromList []
     , i = 0
     , j = 0
+    , activeStep = (0, 0)
     }
 --starts the view of the webpage
 main = 

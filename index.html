@@ -5304,6 +5304,7 @@ var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$th = _VirtualDom_node('th');
 var $elm$html$Html$thead = _VirtualDom_node('thead');
 var $author$project$Main$initModel = {
+	activeStep: _Utils_Tuple2(0, 0),
 	currentState: 1,
 	i: 0,
 	j: 0,
@@ -5614,6 +5615,9 @@ var $elm$browser$Browser$sandbox = function (impl) {
 var $author$project$Main$adder = function (a) {
 	return a + 1;
 };
+var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
+	return array2d.columns;
+};
 var $elm$core$List$repeatHelp = F3(
 	function (result, n, value) {
 		repeatHelp:
@@ -5656,8 +5660,19 @@ var $author$project$Main$craeteSolveTable = F3(
 			}
 		}
 	});
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
 var $justgage$tachyons_elm$Tachyons$Classes$pl4 = 'pl4';
 var $justgage$tachyons_elm$Tachyons$Classes$pr6 = 'pr6';
+var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
+	return $elm$core$Array$length(array2d.data);
+};
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
 var $elm$core$Array$getHelp = F3(
 	function (shift, index, tree) {
 		getHelp:
@@ -6242,7 +6257,12 @@ var $author$project$Main$update = F2(
 				return _Utils_update(
 					model,
 					{
-						solveTable: A4($tortus$elm_array_2d$Array2D$set, 2, 2, 7, model.solveTable)
+						activeStep: (_Utils_cmp(
+							model.activeStep.b,
+							$tortus$elm_array_2d$Array2D$columns(model.solveTable) - 1) < 0) ? A2($elm$core$Tuple$pair, model.activeStep.a, model.activeStep.b + 1) : ((_Utils_cmp(
+							model.activeStep.a,
+							$tortus$elm_array_2d$Array2D$rows(model.solveTable) - 1) < 0) ? A2($elm$core$Tuple$pair, model.activeStep.a + 1, 0) : model.activeStep),
+						solveTable: A4($tortus$elm_array_2d$Array2D$set, model.activeStep.a, model.activeStep.b, 7, model.solveTable)
 					});
 			default:
 				return _Utils_update(
@@ -6319,12 +6339,6 @@ var $justgage$tachyons_elm$Tachyons$Classes$pl5 = 'pl5';
 var $justgage$tachyons_elm$Tachyons$Classes$pointer = 'pointer';
 var $justgage$tachyons_elm$Tachyons$Classes$pr3 = 'pr3';
 var $elm$html$Html$pre = _VirtualDom_node('pre');
-var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
-	return array2d.columns;
-};
-var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
-	return $elm$core$Array$length(array2d.data);
-};
 var $author$project$Main$printTest = F3(
 	function (inp, row, col) {
 		return (_Utils_cmp(
