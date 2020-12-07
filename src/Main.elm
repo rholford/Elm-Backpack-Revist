@@ -17,7 +17,7 @@ import List
 import List
 
 -- Defines all types of msgs that can be sent to the update function
-type Msg = Increment | Decrement | Increment2 | Decrement2 | AddItem | RemoveItem | MaxUp | MaxDown | Reset | Submit | UpdateValue | MagicButton
+type Msg = Increment | Decrement | Increment2 | Decrement2 | AddItem | RemoveItem | MaxUp | MaxDown | Reset | Submit | NextStep | PrevStep | MagicButton
 
 -- Converts a list if items to a comma seperated list
 listToString : (List Int) -> String
@@ -188,8 +188,8 @@ state a model=
                 Html.pre []  [text (printTest model.solveTable 0 0)]
             ]
             ,div [][
-                button [] [text "Previous Step"]
-               ,button [onClick UpdateValue] [text "Next Step"]  
+                button [onClick PrevStep] [text "Previous Step"]
+               ,button [onClick NextStep] [text "Next Step"]  
             ]
             ,div [][
               button [onClick MagicButton] [text "Solve"]               
@@ -278,15 +278,28 @@ update msg model=
         , values = List.reverse model.values
         , currentState = 2
         , solveTable = solveTableToArray (craeteSolveTable [] (List.length model.values + 1) (model.maxWeight + 1)  ) }
-    UpdateValue ->
+    PrevStep -> {model | 
+         activeStep = if ((Tuple.second(model.activeStep) - 1) >= 0) then (Tuple.pair (Tuple.first(model.activeStep)) (Tuple.second(model.activeStep) - 1)) 
+                      else if  ((Tuple.first(model.activeStep) - 1) >= 0) then (Tuple.pair (Tuple.first(model.activeStep) - 1) ((Array2D.columns model.solveTable) - 1))
+                      else Tuple.pair 0 0
+        ,solveTable = if ((Tuple.second(model.activeStep) - 1) >= 0) then Array2D.set (Tuple.first(model.activeStep)) (Tuple.second(model.activeStep) - 1) 0 model.solveTable
+                      else if  ((Tuple.first(model.activeStep) - 1) >= 0) then Array2D.set (Tuple.first(model.activeStep) - 1) ((Array2D.columns model.solveTable) - 1) 0 model.solveTable
+                      else model.solveTable
+        }    
+    NextStep ->
         --{model | solveTable = Array2D.set (model.i) (model.j) (Maybe.Extra.unwrap 0 (test) (Array2D.get (model.i) (model.w) table))  model.solveTable }
-        {model | solveTable = Array2D.set (Tuple.first(model.activeStep)) (Tuple.second(model.activeStep)) 7 model.solveTable  --(Maybe.Extra.unwrap 0 (test) (Array2D.get (i - 1) w table))
-         ,activeStep = if (Tuple.second(model.activeStep) < ((Array2D.columns model.solveTable) - 1)) then (Tuple.pair (Tuple.first(model.activeStep)) (Tuple.second(model.activeStep)+1)) 
-         else if  (Tuple.first(model.activeStep) < ((Array2D.rows model.solveTable) - 1)) then (Tuple.pair (Tuple.first(model.activeStep)+1) 0) 
-         else model.activeStep}
+        --Sets up the holdertable if empty using the zerOneBackpack function
+        --Then updates the values step by step.
+        {model | 
+          holderTable = if Array2D.isEmpty model.holderTable then zeroOneBackpack model.solveTable (Array.fromList model.values) (Array.fromList model.weights) model.maxWeight 0 0 else model.holderTable
+         ,solveTable = Array2D.set (Tuple.first(model.activeStep)) (Tuple.second(model.activeStep)) (Maybe.Extra.unwrap 0 (test) (Array2D.get (Tuple.first(model.activeStep)) (Tuple.second(model.activeStep)) model.holderTable)) model.solveTable  --(Maybe.Extra.unwrap 0 (test) (Array2D.get (i - 1) w table))
+         ,activeStep = if (Tuple.second(model.activeStep) < ((Array2D.columns model.solveTable) - 1)) then (Tuple.pair (Tuple.first(model.activeStep)) (Tuple.second(model.activeStep) + 1)) 
+                       else if  (Tuple.first(model.activeStep) < ((Array2D.rows model.solveTable) - 1)) then (Tuple.pair (Tuple.first(model.activeStep) + 1) 0)
+                       else (Array2D.rows model.solveTable, 0)}
     MagicButton ->
         --todo: make new state var, solved table
         {model | solveTable =  zeroOneBackpack model.solveTable (Array.fromList model.values) (Array.fromList model.weights) model.maxWeight 0 0
+        ,activeStep = (Array2D.rows model.solveTable, 0)
         ,i = List.length (model.values) + 1 --symbolic update to last position?
         ,j = List.length (model.weights) + 1 }  --zeroOneBackpack model.solveTable vi wi bigW 0 0       
 
@@ -303,6 +316,7 @@ type alias Model =
     , table: List (Html Msg)
     , maxWeight: Int
     , currentState: Int
+    , holderTable : Array2D.Array2D Int --"holds" solution for step by step for assignment
     , solveTable: Array2D.Array2D Int--solveTable: List(List(Int))
     , i: Int
     , j: Int
@@ -330,6 +344,7 @@ initModel =
     , maxWeight = 1
     , currentState = 1
     , solveTable = Array2D.fromList []
+    , holderTable = Array2D.fromList []
     , i = 0
     , j = 0
     , activeStep = (0, 0)

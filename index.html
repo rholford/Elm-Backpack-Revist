@@ -5306,6 +5306,7 @@ var $elm$html$Html$thead = _VirtualDom_node('thead');
 var $author$project$Main$initModel = {
 	activeStep: _Utils_Tuple2(0, 0),
 	currentState: 1,
+	holderTable: $tortus$elm_array_2d$Array2D$fromList(_List_Nil),
 	i: 0,
 	j: 0,
 	maxWeight: 1,
@@ -5660,19 +5661,15 @@ var $author$project$Main$craeteSolveTable = F3(
 			}
 		}
 	});
-var $elm$core$Tuple$pair = F2(
-	function (a, b) {
-		return _Utils_Tuple2(a, b);
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (maybeValue.$ === 'Just') {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
 	});
-var $justgage$tachyons_elm$Tachyons$Classes$pl4 = 'pl4';
-var $justgage$tachyons_elm$Tachyons$Classes$pr6 = 'pr6';
-var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
-	return $elm$core$Array$length(array2d.data);
-};
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
 var $elm$core$Array$getHelp = F3(
 	function (shift, index, tree) {
 		getHelp:
@@ -5710,6 +5707,29 @@ var $tortus$elm_array_2d$Array2D$getRow = F2(
 	function (row, array2d) {
 		return A2($elm$core$Array$get, row, array2d.data);
 	});
+var $tortus$elm_array_2d$Array2D$get = F3(
+	function (row, col, array2d) {
+		return A2(
+			$elm$core$Maybe$andThen,
+			$elm$core$Array$get(col),
+			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
+	});
+var $tortus$elm_array_2d$Array2D$isEmpty = function (array2d) {
+	return $elm$core$Array$isEmpty(array2d.data);
+};
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $justgage$tachyons_elm$Tachyons$Classes$pl4 = 'pl4';
+var $justgage$tachyons_elm$Tachyons$Classes$pr6 = 'pr6';
+var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
+	return $elm$core$Array$length(array2d.data);
+};
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (maybe.$ === 'Just') {
@@ -5803,26 +5823,10 @@ var $author$project$Main$sub = function (a) {
 	}
 };
 var $elm$html$Html$td = _VirtualDom_node('td');
-var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (maybeValue.$ === 'Just') {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $tortus$elm_array_2d$Array2D$get = F3(
-	function (row, col, array2d) {
-		return A2(
-			$elm$core$Maybe$andThen,
-			$elm$core$Array$get(col),
-			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
-	});
 var $author$project$Main$test = function (num) {
 	return (num >= 0) ? num : 0;
 };
+var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm_community$maybe_extra$Maybe$Extra$unwrap = F3(
 	function (_default, f, m) {
 		if (m.$ === 'Nothing') {
@@ -6253,7 +6257,22 @@ var $author$project$Main$update = F2(
 						values: $elm$core$List$reverse(model.values),
 						weights: $elm$core$List$reverse(model.weights)
 					});
-			case 'UpdateValue':
+			case 'PrevStep':
+				return _Utils_update(
+					model,
+					{
+						activeStep: ((model.activeStep.b - 1) >= 0) ? A2($elm$core$Tuple$pair, model.activeStep.a, model.activeStep.b - 1) : (((model.activeStep.a - 1) >= 0) ? A2(
+							$elm$core$Tuple$pair,
+							model.activeStep.a - 1,
+							$tortus$elm_array_2d$Array2D$columns(model.solveTable) - 1) : A2($elm$core$Tuple$pair, 0, 0)),
+						solveTable: ((model.activeStep.b - 1) >= 0) ? A4($tortus$elm_array_2d$Array2D$set, model.activeStep.a, model.activeStep.b - 1, 0, model.solveTable) : (((model.activeStep.a - 1) >= 0) ? A4(
+							$tortus$elm_array_2d$Array2D$set,
+							model.activeStep.a - 1,
+							$tortus$elm_array_2d$Array2D$columns(model.solveTable) - 1,
+							0,
+							model.solveTable) : model.solveTable)
+					});
+			case 'NextStep':
 				return _Utils_update(
 					model,
 					{
@@ -6261,13 +6280,35 @@ var $author$project$Main$update = F2(
 							model.activeStep.b,
 							$tortus$elm_array_2d$Array2D$columns(model.solveTable) - 1) < 0) ? A2($elm$core$Tuple$pair, model.activeStep.a, model.activeStep.b + 1) : ((_Utils_cmp(
 							model.activeStep.a,
-							$tortus$elm_array_2d$Array2D$rows(model.solveTable) - 1) < 0) ? A2($elm$core$Tuple$pair, model.activeStep.a + 1, 0) : model.activeStep),
-						solveTable: A4($tortus$elm_array_2d$Array2D$set, model.activeStep.a, model.activeStep.b, 7, model.solveTable)
+							$tortus$elm_array_2d$Array2D$rows(model.solveTable) - 1) < 0) ? A2($elm$core$Tuple$pair, model.activeStep.a + 1, 0) : _Utils_Tuple2(
+							$tortus$elm_array_2d$Array2D$rows(model.solveTable),
+							0)),
+						holderTable: $tortus$elm_array_2d$Array2D$isEmpty(model.holderTable) ? A6(
+							$author$project$Main$zeroOneBackpack,
+							model.solveTable,
+							$elm$core$Array$fromList(model.values),
+							$elm$core$Array$fromList(model.weights),
+							model.maxWeight,
+							0,
+							0) : model.holderTable,
+						solveTable: A4(
+							$tortus$elm_array_2d$Array2D$set,
+							model.activeStep.a,
+							model.activeStep.b,
+							A3(
+								$elm_community$maybe_extra$Maybe$Extra$unwrap,
+								0,
+								$author$project$Main$test,
+								A3($tortus$elm_array_2d$Array2D$get, model.activeStep.a, model.activeStep.b, model.holderTable)),
+							model.solveTable)
 					});
 			default:
 				return _Utils_update(
 					model,
 					{
+						activeStep: _Utils_Tuple2(
+							$tortus$elm_array_2d$Array2D$rows(model.solveTable),
+							0),
 						i: $elm$core$List$length(model.values) + 1,
 						j: $elm$core$List$length(model.weights) + 1,
 						solveTable: A6(
@@ -6289,10 +6330,11 @@ var $author$project$Main$Increment2 = {$: 'Increment2'};
 var $author$project$Main$MagicButton = {$: 'MagicButton'};
 var $author$project$Main$MaxDown = {$: 'MaxDown'};
 var $author$project$Main$MaxUp = {$: 'MaxUp'};
+var $author$project$Main$NextStep = {$: 'NextStep'};
+var $author$project$Main$PrevStep = {$: 'PrevStep'};
 var $author$project$Main$RemoveItem = {$: 'RemoveItem'};
 var $author$project$Main$Reset = {$: 'Reset'};
 var $author$project$Main$Submit = {$: 'Submit'};
-var $author$project$Main$UpdateValue = {$: 'UpdateValue'};
 var $justgage$tachyons_elm$Tachyons$Classes$b = 'b';
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');
@@ -6721,7 +6763,10 @@ var $author$project$Main$state = F2(
 							[
 								A2(
 								$elm$html$Html$button,
-								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$Events$onClick($author$project$Main$PrevStep)
+									]),
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Previous Step')
@@ -6730,7 +6775,7 @@ var $author$project$Main$state = F2(
 								$elm$html$Html$button,
 								_List_fromArray(
 									[
-										$elm$html$Html$Events$onClick($author$project$Main$UpdateValue)
+										$elm$html$Html$Events$onClick($author$project$Main$NextStep)
 									]),
 								_List_fromArray(
 									[
