@@ -13,6 +13,7 @@ import Array2D
 --elm install elm-community/maybe-extra
 import Maybe.Extra
 import List
+import List.Extra 
 
 --Might need to write a CSS file?
 --import Html.Attributes exposing (style)
@@ -42,12 +43,6 @@ craeteSolveTable l n m =
 solveTableToArray : (List (List Int)) -> (Array2D.Array2D Int)
 solveTableToArray inputList = Array2D.fromList  inputList
 
--- hardcoded, uses on magic button
--- gets wrong results with 5,5, correct with 6,6 for items, max weight
---^^^^^^^
-vi = Array.fromList [ 3,7,4,1,2 ]
-wi = Array.fromList [ 5,2,4,2,3 ]
-bigW = 5
 
 test : Int -> Int
 test num = if (num >= 0) then num else 0
@@ -159,7 +154,7 @@ state a model=
                     [button [classes [pr3], onClick RemoveItem, Html.Attributes.disabled (if (List.length model.table <= 1) then True else False)][text ("Remove Item at position  " ++ (String.fromInt model.removePos))]
                     ,div [classes [flex, flex_column, f4]]
                         [button [ onClick RemovePosIncr, Html.Attributes.disabled (if model.removePos + 1 >= (List.length model.table) then True else False) ] [ text "+" ]
-                        ,button [ onClick RemovePosDecr, Html.Attributes.disabled (if model.removePos - 1 < 0 then True else False) ] [ text "-" ]
+                        ,button [ onClick RemovePosDecr, Html.Attributes.disabled (if model.removePos - 1 < 1 then True else False) ] [ text "-" ]
                         ]]
                 ,text " "
                 ,div [classes [flex]] [
@@ -239,7 +234,7 @@ update msg model=
 
     --Changes remmove position
     RemovePosIncr ->
-        {model |  removePos = if model.removePos + 1 < (List.length model.table) then adder model.removePos else model.removePos }
+        {model |  removePos = if (model.removePos + 1 < (List.length model.table)) then adder model.removePos else model.removePos }
 
     RemovePosDecr ->
         {model | removePos = sub model.removePos}    
@@ -261,9 +256,10 @@ update msg model=
     --Weights/Values updates the backend list
     --table updates visual. If/Else stop it from eating the header text
     RemoveItem -> 
-        {model | weights = List.drop 1 model.weights
-        , values = List.drop 1 model.values
-        , table =  if List.length(model.table) > 1 then List.reverse(List.drop 1 (List.reverse model.table)) else model.table}
+        {model | weights = List.reverse (List.Extra.removeAt (model.removePos - 1) (List.reverse model.weights))--List.drop 1 model.weights
+        , values = List.reverse (List.Extra.removeAt (model.removePos - 1) (List.reverse model.values))--List.drop 1 model.values
+        , table =  if List.length(model.table) > 1 then List.Extra.removeAt model.removePos model.table else model.table
+        , removePos = 1}
 
     --adds to the max weight value
     MaxUp ->
@@ -275,6 +271,7 @@ update msg model=
     Reset ->
         {model | one = 1
         , two = 1
+        , removePos = 1
         , weights = []
         , values = []
         , table = [table []
@@ -351,7 +348,7 @@ initModel : Model
 initModel = 
     { one = 1
     , two = 1
-    , removePos = 0
+    , removePos = 1
     , weights = []
     , values = []
     , table = [table []

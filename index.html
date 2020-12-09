@@ -5311,7 +5311,7 @@ var $author$project$Main$initModel = {
 	j: 0,
 	maxWeight: 1,
 	one: 1,
-	removePos: 0,
+	removePos: 1,
 	solveTable: $tortus$elm_array_2d$Array2D$fromList(_List_Nil),
 	table: _List_fromArray(
 		[
@@ -5724,6 +5724,148 @@ var $elm$core$Tuple$pair = F2(
 	});
 var $justgage$tachyons_elm$Tachyons$Classes$pl4 = 'pl4';
 var $justgage$tachyons_elm$Tachyons$Classes$pr6 = 'pr6';
+var $elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
+		while (true) {
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2($elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
+	});
+var $elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return $elm$core$List$reverse(
+			A3($elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var $elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _v0 = _Utils_Tuple2(n, list);
+			_v0$1:
+			while (true) {
+				_v0$5:
+				while (true) {
+					if (!_v0.b.b) {
+						return list;
+					} else {
+						if (_v0.b.b.b) {
+							switch (_v0.a) {
+								case 1:
+									break _v0$1;
+								case 2:
+									var _v2 = _v0.b;
+									var x = _v2.a;
+									var _v3 = _v2.b;
+									var y = _v3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_v0.b.b.b.b) {
+										var _v4 = _v0.b;
+										var x = _v4.a;
+										var _v5 = _v4.b;
+										var y = _v5.a;
+										var _v6 = _v5.b;
+										var z = _v6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _v0$5;
+									}
+								default:
+									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
+										var _v7 = _v0.b;
+										var x = _v7.a;
+										var _v8 = _v7.b;
+										var y = _v8.a;
+										var _v9 = _v8.b;
+										var z = _v9.a;
+										var _v10 = _v9.b;
+										var w = _v10.a;
+										var tl = _v10.b;
+										return (ctr > 1000) ? A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _v0$5;
+									}
+							}
+						} else {
+							if (_v0.a === 1) {
+								break _v0$1;
+							} else {
+								break _v0$5;
+							}
+						}
+					}
+				}
+				return list;
+			}
+			var _v1 = _v0.b;
+			var x = _v1.a;
+			return _List_fromArray(
+				[x]);
+		}
+	});
+var $elm$core$List$take = F2(
+	function (n, list) {
+		return A3($elm$core$List$takeFast, 0, n, list);
+	});
+var $elm_community$list_extra$List$Extra$removeAt = F2(
+	function (index, l) {
+		if (index < 0) {
+			return l;
+		} else {
+			var _v0 = A2($elm$core$List$drop, index, l);
+			if (!_v0.b) {
+				return l;
+			} else {
+				var rest = _v0.b;
+				return _Utils_ap(
+					A2($elm$core$List$take, index, l),
+					rest);
+			}
+		}
+	});
 var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
 	return $elm$core$Array$length(array2d.data);
 };
@@ -6175,13 +6317,18 @@ var $author$project$Main$update = F2(
 				return _Utils_update(
 					model,
 					{
-						table: ($elm$core$List$length(model.table) > 1) ? $elm$core$List$reverse(
+						removePos: 1,
+						table: ($elm$core$List$length(model.table) > 1) ? A2($elm_community$list_extra$List$Extra$removeAt, model.removePos, model.table) : model.table,
+						values: $elm$core$List$reverse(
 							A2(
-								$elm$core$List$drop,
-								1,
-								$elm$core$List$reverse(model.table))) : model.table,
-						values: A2($elm$core$List$drop, 1, model.values),
-						weights: A2($elm$core$List$drop, 1, model.weights)
+								$elm_community$list_extra$List$Extra$removeAt,
+								model.removePos - 1,
+								$elm$core$List$reverse(model.values))),
+						weights: $elm$core$List$reverse(
+							A2(
+								$elm_community$list_extra$List$Extra$removeAt,
+								model.removePos - 1,
+								$elm$core$List$reverse(model.weights)))
 					});
 			case 'MaxUp':
 				return _Utils_update(
@@ -6204,6 +6351,7 @@ var $author$project$Main$update = F2(
 						holderTable: $tortus$elm_array_2d$Array2D$fromList(_List_Nil),
 						maxWeight: 1,
 						one: 1,
+						removePos: 1,
 						solveTable: $tortus$elm_array_2d$Array2D$fromList(_List_Nil),
 						table: _List_fromArray(
 							[
@@ -6685,7 +6833,7 @@ var $author$project$Main$state = F2(
 													[
 														$elm$html$Html$Events$onClick($author$project$Main$RemovePosDecr),
 														$elm$html$Html$Attributes$disabled(
-														((model.removePos - 1) < 0) ? true : false)
+														((model.removePos - 1) < 1) ? true : false)
 													]),
 												_List_fromArray(
 													[
