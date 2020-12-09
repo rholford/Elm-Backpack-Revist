@@ -5311,6 +5311,7 @@ var $author$project$Main$initModel = {
 	j: 0,
 	maxWeight: 1,
 	one: 1,
+	removePos: 0,
 	solveTable: $tortus$elm_array_2d$Array2D$fromList(_List_Nil),
 	table: _List_fromArray(
 		[
@@ -6097,6 +6098,20 @@ var $author$project$Main$update = F2(
 					{
 						two: $author$project$Main$sub(model.two)
 					});
+			case 'RemovePosIncr':
+				return _Utils_update(
+					model,
+					{
+						removePos: (_Utils_cmp(
+							model.removePos + 1,
+							$elm$core$List$length(model.table)) < 0) ? $author$project$Main$adder(model.removePos) : model.removePos
+					});
+			case 'RemovePosDecr':
+				return _Utils_update(
+					model,
+					{
+						removePos: $author$project$Main$sub(model.removePos)
+					});
 			case 'AddItem':
 				return _Utils_update(
 					model,
@@ -6165,14 +6180,16 @@ var $author$project$Main$update = F2(
 								$elm$core$List$drop,
 								1,
 								$elm$core$List$reverse(model.table))) : model.table,
-						values: A2(
-							$elm$core$List$drop,
-							$elm$core$List$length(model.values),
-							model.values),
-						weights: A2(
-							$elm$core$List$drop,
-							$elm$core$List$length(model.weights),
-							model.weights)
+						values: $elm$core$List$reverse(
+							A2(
+								$elm$core$List$drop,
+								1,
+								$elm$core$List$reverse(model.values))),
+						weights: $elm$core$List$reverse(
+							A2(
+								$elm$core$List$drop,
+								1,
+								$elm$core$List$reverse(model.weights)))
 					});
 			case 'MaxUp':
 				return _Utils_update(
@@ -6190,6 +6207,7 @@ var $author$project$Main$update = F2(
 				return _Utils_update(
 					model,
 					{
+						activeStep: _Utils_Tuple2(0, 0),
 						currentState: 1,
 						maxWeight: 1,
 						one: 1,
@@ -6333,10 +6351,21 @@ var $author$project$Main$MaxUp = {$: 'MaxUp'};
 var $author$project$Main$NextStep = {$: 'NextStep'};
 var $author$project$Main$PrevStep = {$: 'PrevStep'};
 var $author$project$Main$RemoveItem = {$: 'RemoveItem'};
+var $author$project$Main$RemovePosDecr = {$: 'RemovePosDecr'};
+var $author$project$Main$RemovePosIncr = {$: 'RemovePosIncr'};
 var $author$project$Main$Reset = {$: 'Reset'};
 var $author$project$Main$Submit = {$: 'Submit'};
 var $justgage$tachyons_elm$Tachyons$Classes$b = 'b';
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $justgage$tachyons_elm$Tachyons$Classes$f1 = 'f1';
 var $justgage$tachyons_elm$Tachyons$Classes$f2 = 'f2';
@@ -6507,7 +6536,9 @@ var $author$project$Main$state = F2(
 										$elm$html$Html$button,
 										_List_fromArray(
 											[
-												$elm$html$Html$Events$onClick($author$project$Main$Decrement)
+												$elm$html$Html$Events$onClick($author$project$Main$Decrement),
+												$elm$html$Html$Attributes$disabled(
+												(model.one <= 1) ? true : false)
 											]),
 										_List_fromArray(
 											[
@@ -6562,7 +6593,9 @@ var $author$project$Main$state = F2(
 										$elm$html$Html$button,
 										_List_fromArray(
 											[
-												$elm$html$Html$Events$onClick($author$project$Main$Decrement2)
+												$elm$html$Html$Events$onClick($author$project$Main$Decrement2),
+												$elm$html$Html$Attributes$disabled(
+												(model.two <= 1) ? true : false)
 											]),
 										_List_fromArray(
 											[
@@ -6587,46 +6620,70 @@ var $author$project$Main$state = F2(
 									])),
 								$elm$html$Html$text(' '),
 								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										$elm$html$Html$Events$onClick($author$project$Main$RemoveItem)
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Remove Item')
-									])),
-								$elm$html$Html$text(' '),
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										$elm$html$Html$Events$onClick($author$project$Main$Submit)
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Submit Question')
-									]))
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$justgage$tachyons_elm$Tachyons$classes(
-								_List_fromArray(
-									[$justgage$tachyons_elm$Tachyons$Classes$flex]))
-							]),
-						_List_fromArray(
-							[
-								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
 										$justgage$tachyons_elm$Tachyons$classes(
 										_List_fromArray(
-											[$justgage$tachyons_elm$Tachyons$Classes$pr3]))
+											[$justgage$tachyons_elm$Tachyons$Classes$flex, $justgage$tachyons_elm$Tachyons$Classes$pb2, $justgage$tachyons_elm$Tachyons$Classes$pt2, $justgage$tachyons_elm$Tachyons$Classes$f2]))
 									]),
-								model.table),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$justgage$tachyons_elm$Tachyons$classes(
+												_List_fromArray(
+													[$justgage$tachyons_elm$Tachyons$Classes$pr3])),
+												$elm$html$Html$Events$onClick($author$project$Main$RemoveItem),
+												$elm$html$Html$Attributes$disabled(
+												($elm$core$List$length(model.table) <= 1) ? true : false)
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(
+												'Remove Item at position  ' + $elm$core$String$fromInt(model.removePos))
+											])),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$justgage$tachyons_elm$Tachyons$classes(
+												_List_fromArray(
+													[$justgage$tachyons_elm$Tachyons$Classes$flex, $justgage$tachyons_elm$Tachyons$Classes$flex_column, $justgage$tachyons_elm$Tachyons$Classes$f4]))
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$button,
+												_List_fromArray(
+													[
+														$elm$html$Html$Events$onClick($author$project$Main$RemovePosIncr),
+														$elm$html$Html$Attributes$disabled(
+														(_Utils_cmp(
+															model.removePos + 1,
+															$elm$core$List$length(model.table)) > -1) ? true : false)
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('+')
+													])),
+												A2(
+												$elm$html$Html$button,
+												_List_fromArray(
+													[
+														$elm$html$Html$Events$onClick($author$project$Main$RemovePosDecr),
+														$elm$html$Html$Attributes$disabled(
+														((model.removePos - 1) < 0) ? true : false)
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('-')
+													]))
+											]))
+									])),
+								$elm$html$Html$text(' '),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
@@ -6638,7 +6695,7 @@ var $author$project$Main$state = F2(
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										'Max Weight: ' + $elm$core$String$fromInt(model.maxWeight)),
+										'Problem Weight (W): ' + $elm$core$String$fromInt(model.maxWeight)),
 										A2(
 										$elm$html$Html$div,
 										_List_fromArray(
@@ -6663,14 +6720,48 @@ var $author$project$Main$state = F2(
 												$elm$html$Html$button,
 												_List_fromArray(
 													[
-														$elm$html$Html$Events$onClick($author$project$Main$MaxDown)
+														$elm$html$Html$Events$onClick($author$project$Main$MaxDown),
+														$elm$html$Html$Attributes$disabled(
+														(model.maxWeight <= 1) ? true : false)
 													]),
 												_List_fromArray(
 													[
 														$elm$html$Html$text('-')
 													]))
 											]))
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Events$onClick($author$project$Main$Submit),
+										$elm$html$Html$Attributes$disabled(
+										($elm$core$List$length(model.table) <= 1) ? true : false)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Submit Question')
 									]))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$justgage$tachyons_elm$Tachyons$classes(
+								_List_fromArray(
+									[$justgage$tachyons_elm$Tachyons$Classes$flex]))
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$justgage$tachyons_elm$Tachyons$classes(
+										_List_fromArray(
+											[$justgage$tachyons_elm$Tachyons$Classes$pr3]))
+									]),
+								model.table)
 							]))
 					]));
 		} else {
@@ -6761,11 +6852,21 @@ var $author$project$Main$state = F2(
 						_List_Nil,
 						_List_fromArray(
 							[
+								$elm$html$Html$text(
+								'Active Step: (' + ($elm$core$String$fromInt(model.activeStep.a) + (',' + ($elm$core$String$fromInt(model.activeStep.b) + ')'))))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
 								A2(
 								$elm$html$Html$button,
 								_List_fromArray(
 									[
-										$elm$html$Html$Events$onClick($author$project$Main$PrevStep)
+										$elm$html$Html$Events$onClick($author$project$Main$PrevStep),
+										$elm$html$Html$Attributes$disabled(
+										((!model.activeStep.a) && (!model.activeStep.b)) ? true : false)
 									]),
 								_List_fromArray(
 									[
@@ -6775,7 +6876,11 @@ var $author$project$Main$state = F2(
 								$elm$html$Html$button,
 								_List_fromArray(
 									[
-										$elm$html$Html$Events$onClick($author$project$Main$NextStep)
+										$elm$html$Html$Events$onClick($author$project$Main$NextStep),
+										$elm$html$Html$Attributes$disabled(
+										(_Utils_cmp(
+											model.activeStep.a,
+											$tortus$elm_array_2d$Array2D$rows(model.solveTable) - 1) > 0) ? true : false)
 									]),
 								_List_fromArray(
 									[

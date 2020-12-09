@@ -13,11 +13,13 @@ import Array2D
 --elm install elm-community/maybe-extra
 import Maybe.Extra
 import List
-import List
-import List
+
+--Might need to write a CSS file?
+--import Html.Attributes exposing (style)
+import Html.Attributes
 
 -- Defines all types of msgs that can be sent to the update function
-type Msg = Increment | Decrement | Increment2 | Decrement2 | AddItem | RemoveItem | MaxUp | MaxDown | Reset | Submit | NextStep | PrevStep | MagicButton
+type Msg = Increment | Decrement | Increment2 | Decrement2 | AddItem | RemoveItem | MaxUp | MaxDown | Reset | Submit | NextStep | PrevStep | MagicButton | RemovePosIncr | RemovePosDecr
 
 -- Converts a list if items to a comma seperated list
 listToString : (List Int) -> String
@@ -140,31 +142,36 @@ state a model=
                 [div [classes [pr3, flex_column]] [ text ("Value: "++(String.fromInt model.one)) ]
                 ,div [classes [flex, flex_column, f4]]
                     [button [ onClick Increment ] [ text "+" ]
-                    ,button [ onClick Decrement ] [ text "-" ]
+                    ,button [ onClick Decrement, Html.Attributes.disabled (if model.one <= 1 then True else False) ] [ text "-" ]
                     ]
                 ]
             , div [classes [flex,f2, pl5]]
                 [div [classes [pr3]] [ text ("Weight: " ++ (String.fromInt model.two)) ]
                 ,div [classes [flex, flex_column, f4]]
                     [button [ onClick Increment2 ] [ text "+" ]
-                    ,button [ onClick Decrement2 ] [ text "-" ]
+                    ,button [ onClick Decrement2, Html.Attributes.disabled (if model.two <= 1 then True else False) ] [ text "-" ]
                     ]
                 ]
             , div []
                 [button [onClick AddItem][text "Add Item"]
                 ,text " "
-                ,button [onClick RemoveItem][text "Remove Item"]
+                ,div [classes [flex, pb2,pt2, f2]]
+                    [button [classes [pr3], onClick RemoveItem, Html.Attributes.disabled (if (List.length model.table <= 1) then True else False)][text ("Remove Item at position  " ++ (String.fromInt model.removePos))]
+                    ,div [classes [flex, flex_column, f4]]
+                        [button [ onClick RemovePosIncr, Html.Attributes.disabled (if model.removePos + 1 >= (List.length model.table) then True else False) ] [ text "+" ]
+                        ,button [ onClick RemovePosDecr, Html.Attributes.disabled (if model.removePos - 1 < 0 then True else False) ] [ text "-" ]
+                        ]]
                 ,text " "
-                ,button [onClick Submit][text "Submit Question"]]
-            , div [classes [flex]] [
-                div [classes [pr3]] model.table
                 ,div [classes [flex]] [
-                    text ("Max Weight: " ++ (String.fromInt model.maxWeight))
+                    text ("Problem Weight (W): " ++ (String.fromInt model.maxWeight))
                     ,div [classes [flex, flex_column, f4]]
                     [button [ onClick MaxUp ] [ text "+" ]
-                    ,button [ onClick MaxDown ] [ text "-" ]
+                    ,button [ onClick MaxDown, Html.Attributes.disabled (if model.maxWeight <= 1 then True else False) ] [ text "-" ]
                     ]  
                 ]
+                ,button [onClick Submit, Html.Attributes.disabled (if (List.length model.table) <= 1 then True else False)][text "Submit Question"]]
+            , div [classes [flex]] [
+                div [classes [pr3]] model.table
             ]
             
                 
@@ -188,8 +195,11 @@ state a model=
                 Html.pre []  [text (printTest model.solveTable 0 0)]
             ]
             ,div [][
-                button [onClick PrevStep] [text "Previous Step"]
-               ,button [onClick NextStep] [text "Next Step"]  
+                text ("Active Step: (" ++ String.fromInt(Tuple.first(model.activeStep)) ++ "," ++ String.fromInt(Tuple.second(model.activeStep)) ++ ")")
+            ]            
+            ,div [][
+                button [onClick PrevStep, Html.Attributes.disabled (if (Tuple.first(model.activeStep) == 0 && Tuple.second(model.activeStep) == 0) then True else False)] [text "Previous Step"]
+               ,button [onClick NextStep, Html.Attributes.disabled (if (Tuple.first(model.activeStep) > (Array2D.rows model.solveTable) - 1) then True else False)] [text "Next Step"]  
             ]
             ,div [][
               button [onClick MagicButton] [text "Solve"]               
@@ -227,6 +237,13 @@ update msg model=
     Decrement2 ->
       {model | two = sub model.two}
 
+    --Changes remmove position
+    RemovePosIncr ->
+        {model |  removePos = if model.removePos + 1 < (List.length model.table) then adder model.removePos else model.removePos }
+
+    RemovePosDecr ->
+        {model | removePos = sub model.removePos}    
+
     -- Adds a value and a weight to their respective values
     AddItem ->
         {model | weights = model.two :: model.weights
@@ -244,8 +261,8 @@ update msg model=
     --Weights/Values updates the backend list
     --table updates visual. If/Else stop it from eating the header text
     RemoveItem -> 
-        {model | weights = List.drop (List.length(model.weights)) model.weights
-        , values = List.drop (List.length(model.values)) model.values
+        {model | weights = List.reverse(List.drop 1 (List.reverse model.weights))
+        , values = List.reverse(List.drop 1 (List.reverse model.values))
         , table =  if List.length(model.table) > 1 then List.reverse(List.drop 1 (List.reverse model.table)) else model.table}
 
     --adds to the max weight value
@@ -271,6 +288,7 @@ update msg model=
                 ]
         , maxWeight = 1
         , currentState = 1
+        , activeStep = (0,0)
         }
     --updates the model to show the solution screen
     Submit ->
@@ -311,6 +329,7 @@ view model= state model.currentState model
 type alias Model =
     { one: Int
     , two: Int
+    , removePos: Int
     , weights: List Int
     , values: List Int
     , table: List (Html Msg)
@@ -328,6 +347,7 @@ initModel : Model
 initModel = 
     { one = 1
     , two = 1
+    , removePos = 0
     , weights = []
     , values = []
     , table = [table []

@@ -7,8 +7,13 @@ Initial Commit: Clone of old code, version submitted via avenue.
 The prototype appears to be able to algorithmically solve user inputted problems.
 Remove button removes last item entered correctly.
 Previous/Next now works. (Step by step)
+Enable/Disable Buttons.
+Non-function removal position selection.
 
 ## todo
+Fix the following bug:
+First usage. Submit. Solve. Previous. Next doesn't always fill the table?
+
 Restructure the HTML.
 
 Table lineup. Possibly table interactivity. Highlighting. Algorithmic output box. ETC
