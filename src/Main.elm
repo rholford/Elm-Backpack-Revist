@@ -261,8 +261,8 @@ update msg model=
     --Weights/Values updates the backend list
     --table updates visual. If/Else stop it from eating the header text
     RemoveItem -> 
-        {model | weights = List.reverse(List.drop 1 (List.reverse model.weights))
-        , values = List.reverse(List.drop 1 (List.reverse model.values))
+        {model | weights = List.drop 1 model.weights
+        , values = List.drop 1 model.values
         , table =  if List.length(model.table) > 1 then List.reverse(List.drop 1 (List.reverse model.table)) else model.table}
 
     --adds to the max weight value
@@ -289,6 +289,8 @@ update msg model=
         , maxWeight = 1
         , currentState = 1
         , activeStep = (0,0)
+        , solveTable = Array2D.fromList []
+        , holderTable = Array2D.fromList []
         }
     --updates the model to show the solution screen
     Submit ->
@@ -297,7 +299,8 @@ update msg model=
         , currentState = 2
         , solveTable = solveTableToArray (craeteSolveTable [] (List.length model.values + 1) (model.maxWeight + 1)  ) }
     PrevStep -> {model | 
-         activeStep = if ((Tuple.second(model.activeStep) - 1) >= 0) then (Tuple.pair (Tuple.first(model.activeStep)) (Tuple.second(model.activeStep) - 1)) 
+         holderTable = if Array2D.isEmpty model.holderTable then zeroOneBackpack model.solveTable (Array.fromList model.values) (Array.fromList model.weights) model.maxWeight 0 0 else model.holderTable
+         ,activeStep = if ((Tuple.second(model.activeStep) - 1) >= 0) then (Tuple.pair (Tuple.first(model.activeStep)) (Tuple.second(model.activeStep) - 1)) 
                       else if  ((Tuple.first(model.activeStep) - 1) >= 0) then (Tuple.pair (Tuple.first(model.activeStep) - 1) ((Array2D.columns model.solveTable) - 1))
                       else Tuple.pair 0 0
         ,solveTable = if ((Tuple.second(model.activeStep) - 1) >= 0) then Array2D.set (Tuple.first(model.activeStep)) (Tuple.second(model.activeStep) - 1) 0 model.solveTable
@@ -317,6 +320,7 @@ update msg model=
     MagicButton ->
         --todo: make new state var, solved table
         {model | solveTable =  zeroOneBackpack model.solveTable (Array.fromList model.values) (Array.fromList model.weights) model.maxWeight 0 0
+        ,holderTable = if Array2D.isEmpty model.holderTable then zeroOneBackpack model.solveTable (Array.fromList model.values) (Array.fromList model.weights) model.maxWeight 0 0 else model.holderTable
         ,activeStep = (Array2D.rows model.solveTable, 0)
         ,i = List.length (model.values) + 1 --symbolic update to last position?
         ,j = List.length (model.weights) + 1 }  --zeroOneBackpack model.solveTable vi wi bigW 0 0       

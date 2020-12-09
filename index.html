@@ -6180,16 +6180,8 @@ var $author$project$Main$update = F2(
 								$elm$core$List$drop,
 								1,
 								$elm$core$List$reverse(model.table))) : model.table,
-						values: $elm$core$List$reverse(
-							A2(
-								$elm$core$List$drop,
-								1,
-								$elm$core$List$reverse(model.values))),
-						weights: $elm$core$List$reverse(
-							A2(
-								$elm$core$List$drop,
-								1,
-								$elm$core$List$reverse(model.weights)))
+						values: A2($elm$core$List$drop, 1, model.values),
+						weights: A2($elm$core$List$drop, 1, model.weights)
 					});
 			case 'MaxUp':
 				return _Utils_update(
@@ -6209,8 +6201,10 @@ var $author$project$Main$update = F2(
 					{
 						activeStep: _Utils_Tuple2(0, 0),
 						currentState: 1,
+						holderTable: $tortus$elm_array_2d$Array2D$fromList(_List_Nil),
 						maxWeight: 1,
 						one: 1,
+						solveTable: $tortus$elm_array_2d$Array2D$fromList(_List_Nil),
 						table: _List_fromArray(
 							[
 								A2(
@@ -6283,6 +6277,14 @@ var $author$project$Main$update = F2(
 							$elm$core$Tuple$pair,
 							model.activeStep.a - 1,
 							$tortus$elm_array_2d$Array2D$columns(model.solveTable) - 1) : A2($elm$core$Tuple$pair, 0, 0)),
+						holderTable: $tortus$elm_array_2d$Array2D$isEmpty(model.holderTable) ? A6(
+							$author$project$Main$zeroOneBackpack,
+							model.solveTable,
+							$elm$core$Array$fromList(model.values),
+							$elm$core$Array$fromList(model.weights),
+							model.maxWeight,
+							0,
+							0) : model.holderTable,
 						solveTable: ((model.activeStep.b - 1) >= 0) ? A4($tortus$elm_array_2d$Array2D$set, model.activeStep.a, model.activeStep.b - 1, 0, model.solveTable) : (((model.activeStep.a - 1) >= 0) ? A4(
 							$tortus$elm_array_2d$Array2D$set,
 							model.activeStep.a - 1,
@@ -6327,6 +6329,14 @@ var $author$project$Main$update = F2(
 						activeStep: _Utils_Tuple2(
 							$tortus$elm_array_2d$Array2D$rows(model.solveTable),
 							0),
+						holderTable: $tortus$elm_array_2d$Array2D$isEmpty(model.holderTable) ? A6(
+							$author$project$Main$zeroOneBackpack,
+							model.solveTable,
+							$elm$core$Array$fromList(model.values),
+							$elm$core$Array$fromList(model.weights),
+							model.maxWeight,
+							0,
+							0) : model.holderTable,
 						i: $elm$core$List$length(model.values) + 1,
 						j: $elm$core$List$length(model.weights) + 1,
 						solveTable: A6(

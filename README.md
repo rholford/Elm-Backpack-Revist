@@ -9,10 +9,9 @@ Remove button removes last item entered correctly.
 Previous/Next now works. (Step by step)
 Enable/Disable Buttons.
 Non-function removal position selection.
+Solve bug possibly fixed
 
 ## todo
-Fix the following bug:
-First usage. Submit. Solve. Previous. Next doesn't always fill the table?
 
 Restructure the HTML.
 
