@@ -32,20 +32,24 @@ listToString l =
 
 
 -- creates the table showing the final solution. Initially filled with zeros
-craeteSolveTable : (List (List Int)) -> Int -> Int -> (List (List Int))
-craeteSolveTable l n m =
+createSolveTable : (List (List Int)) -> Int -> Int -> (List (List Int))
+createSolveTable l n m =
     case n of
         0 -> l 
-        otherwise -> craeteSolveTable ((List.repeat m 0)::l) (n-1) m
+        otherwise -> createSolveTable ((List.repeat m 0)::l) (n-1) m
         --zeroOneBackpack testTable2 vi wi bigW 0 0
 
 --converts a list to an Array2D object
 solveTableToArray : (List (List Int)) -> (Array2D.Array2D Int)
 solveTableToArray inputList = Array2D.fromList  inputList
 
-
+--int unwrapper
 test : Int -> Int
 test num = if (num >= 0) then num else 0
+
+--array unwrapper
+arrayUnwrap : Array.Array a -> Array.Array a
+arrayUnwrap lst = if ((Array.length lst) > 0) then lst else Array.empty 
 
 zeroOneBackpack : (Array2D.Array2D Int) -> (Array.Array Int) -> (Array.Array Int) -> Int -> Int -> Int -> (Array2D.Array2D Int)
 zeroOneBackpack table valVector weightVector maxW w i = 
@@ -81,7 +85,31 @@ printTest inp row col =
   else if (col >= ((Array2D.columns inp) - 1) && (row < ((Array2D.rows inp) - 1) )) then (String.fromInt (Maybe.Extra.unwrap 0 (test) (Array2D.get row col inp))) ++ " \n" ++ printTest inp (row+1) 0
   else (String.fromInt (Maybe.Extra.unwrap -1 (test) (Array2D.get row col inp)))
 
--- converts the solution table to something that can be rendered in html
+--removed col int, using a hlper function
+
+printSolTable : Array2D.Array2D Int -> Int -> List (Html Msg) 
+printSolTable inp row =
+    case (row == ((Array2D.rows inp) - 1)) of
+        False -> [Html.tr solveTableStyle (columnHelper (Array.toList(Maybe.Extra.unwrap Array.empty arrayUnwrap (Array2D.getRow row inp))) 0)] ++ printSolTable inp (row+1)
+        True -> [Html.tr solveTableStyle (columnHelper (Array.toList(Maybe.Extra.unwrap Array.empty arrayUnwrap (Array2D.getRow row inp))) 0)]
+--Failed attempt
+ --if (col == 0) then [Html.tr [] ((td[] [(text (String.fromInt (Maybe.Extra.unwrap 0 (test) (Array2D.get row col inp))))])::(printSolTable inp row (col+1)))]
+  --else if (col < ((Array2D.columns inp)- 1)) then ((td[] [(text (String.fromInt (Maybe.Extra.unwrap 0 (test) (Array2D.get row col inp))))])::(printSolTable inp row (col+1)))
+  --else if (col >= ((Array2D.columns inp) - 1) && (row < ((Array2D.rows inp) - 1) )) then ((td[] [(text (String.fromInt (Maybe.Extra.unwrap 0 (test) (Array2D.get row col inp))))])::(printSolTable inp (row+1) (0)))
+  --else [Html.tr [][]]--(String.fromInt (Maybe.Extra.unwrap -1 (test) (Array2D.get row col inp)))
+--Html.tr []
+
+--Helper function to print out solution columns into html table
+columnHelper : List Int -> Int -> List(Html Msg)
+columnHelper inp col = 
+    case inp of
+        [] -> [Html.text ""]
+        (x::[]) -> [Html.td ([classes [pl2, pr5]] ++ solveTableStyle) [ (text (String.fromInt x)) ]]
+        (x::xs) -> [Html.td ([classes [pl2, pr5]] ++ solveTableStyle) [ (text (String.fromInt x)) ]] ++ columnHelper xs (col+1)
+        
+
+
+-- converts the solution table to something that can be rendered in html (unused?)
 renderSolTable : (List(List Int)) -> Html Msg
 renderSolTable l = 
     case l of
@@ -118,6 +146,9 @@ setValueHelper1 l j s=
         (_,[]) -> []
         (True,(x::xs)) -> s::xs
         (False,(x::xs)) -> x::(setValueHelper1 xs (j-1)s)
+
+solveTableStyle : List (Html.Attribute msg)
+solveTableStyle = [Html.Attributes.style "border" "1px solid black", Html.Attributes.style "text-align" "center", Html.Attributes.style "border-collapse" "collapse"]
 
 --This is the function that places items on the screen. If a is true then it renders the input screen, and if it is false,
 -- it renders the solve screen
@@ -185,12 +216,22 @@ state a model=
                 ,div [][text ("Weights: " ++ (listToString model.weights) )]
                 ,div [][text ("Max Weight: " ++ (String.fromInt model.maxWeight))]
             ]
-            ,div [][
+            --Old, text based outputs. 
+            --,div [][
                 --renderSolTable model.solveTable
-                Html.pre []  [text (printTest model.solveTable 0 0)]
-            ]
+                --Html.pre []  [text (printTest model.solveTable 0 0)]
+            --]
+            ,div []
+                --renderSolTable model.solveTable
+                [   
+                    div [][text ("\n Solution table")]
+                    ,table solveTableStyle (printSolTable model.solveTable 0)
+                ]
+            -- displays active step           
             ,div [][
-                text ("Active Step: (" ++ String.fromInt(Tuple.first(model.activeStep)) ++ "," ++ String.fromInt(Tuple.second(model.activeStep)) ++ ")")
+                (if (Tuple.first(model.activeStep) > (Array2D.rows model.solveTable) - 1) then 
+                    text ("Maximum possible value: " ++ String.fromInt((Maybe.Extra.unwrap 0 (test) (Array2D.get ((Array2D.rows model.solveTable) - 1) ((Array2D.columns model.solveTable) - 1) model.solveTable))))
+                else text ("Active Step: (" ++ String.fromInt(Tuple.first(model.activeStep)) ++ "," ++ String.fromInt(Tuple.second(model.activeStep)) ++ ")"))
             ]            
             ,div [][
                 button [onClick PrevStep, Html.Attributes.disabled (if (Tuple.first(model.activeStep) == 0 && Tuple.second(model.activeStep) == 0) then True else False)] [text "Previous Step"]
@@ -294,7 +335,7 @@ update msg model=
         {model | weights = List.reverse model.weights
         , values = List.reverse model.values
         , currentState = 2
-        , solveTable = solveTableToArray (craeteSolveTable [] (List.length model.values + 1) (model.maxWeight + 1)  ) }
+        , solveTable = solveTableToArray (createSolveTable [] (List.length model.values + 1) (model.maxWeight + 1)  ) }
     PrevStep -> {model | 
          holderTable = if Array2D.isEmpty model.holderTable then zeroOneBackpack model.solveTable (Array.fromList model.values) (Array.fromList model.weights) model.maxWeight 0 0 else model.holderTable
          ,activeStep = if ((Tuple.second(model.activeStep) - 1) >= 0) then (Tuple.pair (Tuple.first(model.activeStep)) (Tuple.second(model.activeStep) - 1)) 

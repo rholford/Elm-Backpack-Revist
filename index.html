@@ -5641,9 +5641,9 @@ var $elm$core$List$repeat = F2(
 	function (n, value) {
 		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
 	});
-var $author$project$Main$craeteSolveTable = F3(
+var $author$project$Main$createSolveTable = F3(
 	function (l, n, m) {
-		craeteSolveTable:
+		createSolveTable:
 		while (true) {
 			if (!n) {
 				return l;
@@ -5658,7 +5658,7 @@ var $author$project$Main$craeteSolveTable = F3(
 				l = $temp$l;
 				n = $temp$n;
 				m = $temp$m;
-				continue craeteSolveTable;
+				continue createSolveTable;
 			}
 		}
 	});
@@ -6410,7 +6410,7 @@ var $author$project$Main$update = F2(
 						currentState: 2,
 						solveTable: $author$project$Main$solveTableToArray(
 							A3(
-								$author$project$Main$craeteSolveTable,
+								$author$project$Main$createSolveTable,
 								_List_Nil,
 								$elm$core$List$length(model.values) + 1,
 								model.maxWeight + 1)),
@@ -6567,31 +6567,111 @@ var $justgage$tachyons_elm$Tachyons$Classes$pl3 = 'pl3';
 var $justgage$tachyons_elm$Tachyons$Classes$pl5 = 'pl5';
 var $justgage$tachyons_elm$Tachyons$Classes$pointer = 'pointer';
 var $justgage$tachyons_elm$Tachyons$Classes$pr3 = 'pr3';
-var $elm$html$Html$pre = _VirtualDom_node('pre');
-var $author$project$Main$printTest = F3(
-	function (inp, row, col) {
-		return (_Utils_cmp(
-			col,
-			$tortus$elm_array_2d$Array2D$columns(inp) - 1) < 0) ? ($elm$core$String$fromInt(
-			A3(
-				$elm_community$maybe_extra$Maybe$Extra$unwrap,
-				0,
-				$author$project$Main$test,
-				A3($tortus$elm_array_2d$Array2D$get, row, col, inp))) + (' ' + A3($author$project$Main$printTest, inp, row, col + 1))) : (((_Utils_cmp(
-			col,
-			$tortus$elm_array_2d$Array2D$columns(inp) - 1) > -1) && (_Utils_cmp(
+var $author$project$Main$arrayUnwrap = function (lst) {
+	return ($elm$core$Array$length(lst) > 0) ? lst : $elm$core$Array$empty;
+};
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $author$project$Main$solveTableStyle = _List_fromArray(
+	[
+		A2($elm$html$Html$Attributes$style, 'border', '1px solid black'),
+		A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+		A2($elm$html$Html$Attributes$style, 'border-collapse', 'collapse')
+	]);
+var $author$project$Main$columnHelper = F2(
+	function (inp, col) {
+		if (!inp.b) {
+			return _List_fromArray(
+				[
+					$elm$html$Html$text('')
+				]);
+		} else {
+			if (!inp.b.b) {
+				var x = inp.a;
+				return _List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_Utils_ap(
+							_List_fromArray(
+								[
+									$justgage$tachyons_elm$Tachyons$classes(
+									_List_fromArray(
+										[$justgage$tachyons_elm$Tachyons$Classes$pl2, $justgage$tachyons_elm$Tachyons$Classes$pr5]))
+								]),
+							$author$project$Main$solveTableStyle),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								$elm$core$String$fromInt(x))
+							]))
+					]);
+			} else {
+				var x = inp.a;
+				var xs = inp.b;
+				return _Utils_ap(
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$td,
+							_Utils_ap(
+								_List_fromArray(
+									[
+										$justgage$tachyons_elm$Tachyons$classes(
+										_List_fromArray(
+											[$justgage$tachyons_elm$Tachyons$Classes$pl2, $justgage$tachyons_elm$Tachyons$Classes$pr5]))
+									]),
+								$author$project$Main$solveTableStyle),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									$elm$core$String$fromInt(x))
+								]))
+						]),
+					A2($author$project$Main$columnHelper, xs, col + 1));
+			}
+		}
+	});
+var $author$project$Main$printSolTable = F2(
+	function (inp, row) {
+		var _v0 = _Utils_eq(
 			row,
-			$tortus$elm_array_2d$Array2D$rows(inp) - 1) < 0)) ? ($elm$core$String$fromInt(
-			A3(
-				$elm_community$maybe_extra$Maybe$Extra$unwrap,
-				0,
-				$author$project$Main$test,
-				A3($tortus$elm_array_2d$Array2D$get, row, col, inp))) + (' \n' + A3($author$project$Main$printTest, inp, row + 1, 0))) : $elm$core$String$fromInt(
-			A3(
-				$elm_community$maybe_extra$Maybe$Extra$unwrap,
-				-1,
-				$author$project$Main$test,
-				A3($tortus$elm_array_2d$Array2D$get, row, col, inp))));
+			$tortus$elm_array_2d$Array2D$rows(inp) - 1);
+		if (!_v0) {
+			return _Utils_ap(
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$tr,
+						$author$project$Main$solveTableStyle,
+						A2(
+							$author$project$Main$columnHelper,
+							$elm$core$Array$toList(
+								A3(
+									$elm_community$maybe_extra$Maybe$Extra$unwrap,
+									$elm$core$Array$empty,
+									$author$project$Main$arrayUnwrap,
+									A2($tortus$elm_array_2d$Array2D$getRow, row, inp))),
+							0))
+					]),
+				A2($author$project$Main$printSolTable, inp, row + 1));
+		} else {
+			return _List_fromArray(
+				[
+					A2(
+					$elm$html$Html$tr,
+					$author$project$Main$solveTableStyle,
+					A2(
+						$author$project$Main$columnHelper,
+						$elm$core$Array$toList(
+							A3(
+								$elm_community$maybe_extra$Maybe$Extra$unwrap,
+								$elm$core$Array$empty,
+								$author$project$Main$arrayUnwrap,
+								A2($tortus$elm_array_2d$Array2D$getRow, row, inp))),
+						0))
+				]);
+		}
 	});
 var $justgage$tachyons_elm$Tachyons$Classes$pt2 = 'pt2';
 var $elm$virtual_dom$VirtualDom$node = function (tag) {
@@ -6997,20 +7077,35 @@ var $author$project$Main$state = F2(
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$pre,
+								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(
-										A3($author$project$Main$printTest, model.solveTable, 0, 0))
-									]))
+										$elm$html$Html$text('\n Solution table')
+									])),
+								A2(
+								$elm$html$Html$table,
+								$author$project$Main$solveTableStyle,
+								A2($author$project$Main$printSolTable, model.solveTable, 0))
 							])),
 						A2(
 						$elm$html$Html$div,
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text(
+								(_Utils_cmp(
+								model.activeStep.a,
+								$tortus$elm_array_2d$Array2D$rows(model.solveTable) - 1) > 0) ? $elm$html$Html$text(
+								'Maximum possible value: ' + $elm$core$String$fromInt(
+									A3(
+										$elm_community$maybe_extra$Maybe$Extra$unwrap,
+										0,
+										$author$project$Main$test,
+										A3(
+											$tortus$elm_array_2d$Array2D$get,
+											$tortus$elm_array_2d$Array2D$rows(model.solveTable) - 1,
+											$tortus$elm_array_2d$Array2D$columns(model.solveTable) - 1,
+											model.solveTable)))) : $elm$html$Html$text(
 								'Active Step: (' + ($elm$core$String$fromInt(model.activeStep.a) + (',' + ($elm$core$String$fromInt(model.activeStep.b) + ')'))))
 							])),
 						A2(
