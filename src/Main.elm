@@ -1,10 +1,13 @@
 module Main exposing (..)
 
+--HTML imports
 import Browser
 import Html exposing (Html, button, div, pre, text, table, thead,th,tr,td)
 import Html.Events exposing (onClick)
 import Tachyons exposing (classes, tachyons)
 import Tachyons.Classes exposing (..)
+--Doing a seperate CSS file may be better form
+import Html.Attributes
 
 --backpack stuff
 import Array
@@ -15,9 +18,7 @@ import Maybe.Extra
 import List
 import List.Extra 
 
---Might need to write a CSS file?
---import Html.Attributes exposing (style)
-import Html.Attributes
+
 
 -- Defines all types of msgs that can be sent to the update function
 type Msg = Increment | Decrement | Increment2 | Decrement2 | AddItem | RemoveItem | MaxUp | MaxDown | Reset | Submit | NextStep | PrevStep | MagicButton | RemovePosIncr | RemovePosDecr
@@ -37,7 +38,6 @@ createSolveTable l n m =
     case n of
         0 -> l 
         otherwise -> createSolveTable ((List.repeat m 0)::l) (n-1) m
-        --zeroOneBackpack testTable2 vi wi bigW 0 0
 
 --converts a list to an Array2D object
 solveTableToArray : (List (List Int)) -> (Array2D.Array2D Int)
@@ -51,6 +51,7 @@ test num = if (num >= 0) then num else 0
 arrayUnwrap : Array.Array a -> Array.Array a
 arrayUnwrap lst = if ((Array.length lst) > 0) then lst else Array.empty 
 
+--0/1 Backpack algorithim. 
 zeroOneBackpack : (Array2D.Array2D Int) -> (Array.Array Int) -> (Array.Array Int) -> Int -> Int -> Int -> (Array2D.Array2D Int)
 zeroOneBackpack table valVector weightVector maxW w i = 
   --base case
@@ -79,14 +80,17 @@ zeroOneBackpack table valVector weightVector maxW w i =
                                      ((Maybe.Extra.unwrap 0 (test) (Array.get (i - 1) valVector)) + (Maybe.Extra.unwrap 0 (test) (Array2D.get (i - 1) (w - (Maybe.Extra.unwrap 0 (test) (Array.get (i - 1) weightVector)) ) table))) 
                                 ) table)
 
+--Old method for printing 2d array, just a string
 printTest : Array2D.Array2D Int -> Int -> Int -> String
 printTest inp row col = 
   if (col < ((Array2D.columns inp)- 1)) then (String.fromInt (Maybe.Extra.unwrap 0 (test) (Array2D.get row col inp))) ++ " " ++ printTest inp row (col+1)
   else if (col >= ((Array2D.columns inp) - 1) && (row < ((Array2D.rows inp) - 1) )) then (String.fromInt (Maybe.Extra.unwrap 0 (test) (Array2D.get row col inp))) ++ " \n" ++ printTest inp (row+1) 0
   else (String.fromInt (Maybe.Extra.unwrap -1 (test) (Array2D.get row col inp)))
 
---removed col int, using a hlper function
-
+--New print method for the solution table, as an HTML table
+--Keeps allignment unlike string, looks better
+--Note that Item 0 (W,V = 0,0) and Weight 0 are that base cases for the algorithim's 'lookback' steps, and will always be 0.
+--removed col int, might be useful to re-add it for interactions with table elements
 printSolTable : Array2D.Array2D Int -> Int -> List (Html Msg) 
 printSolTable inp row =
     case (row == ((Array2D.rows inp) - 1)) of
@@ -108,45 +112,6 @@ columnHelper inp col =
         (x::xs) -> [Html.td ([classes [pl2, pr5]] ++ solveTableStyle) [ (text (String.fromInt x)) ]] ++ columnHelper xs (col+1)
         
 
-
--- converts the solution table to something that can be rendered in html (unused?)
-renderSolTable : (List(List Int)) -> Html Msg
-renderSolTable l = 
-    case l of
-        [] -> text ""
-        (x::xs) -> div [][text (listToString x)
-                        ,(renderSolTable xs)]
-
---gets a value from a 2D list
-getValueFromIndex : (List(List Int)) -> Int -> Int -> Int
-getValueFromIndex l i j=
-    case ((i == 1),l) of 
-        (_,[]) -> 0
-        (True,(x::xs)) -> getValueHelper1 x j 
-        (False,(x::xs)) -> getValueFromIndex xs (i-1) j
-
-getValueHelper1 : (List Int) -> Int -> Int
-getValueHelper1 l j =
-    case ((j==1),l) of
-        (_,[]) -> 0
-        (True,(x::xs)) -> x
-        (False,(x::xs)) -> getValueHelper1 xs (j-1)
-
---sets the value of an index in s 2D list
-setValueFromIndex : (List(List Int)) -> Int -> Int -> Int -> (List(List Int))
-setValueFromIndex l i j s=
-    case ((i == 1),l) of 
-        (_,[]) -> []
-        (True,(x::xs)) -> (setValueHelper1 x j s)::xs
-        (False,(x::xs)) -> x::(setValueFromIndex xs (i-1) j s)
-
-setValueHelper1 : (List Int) -> Int -> Int -> (List Int)
-setValueHelper1 l j s=
-    case ((j==1),l) of
-        (_,[]) -> []
-        (True,(x::xs)) -> s::xs
-        (False,(x::xs)) -> x::(setValueHelper1 xs (j-1)s)
-
 solveTableStyle : List (Html.Attribute msg)
 solveTableStyle = [Html.Attributes.style "border" "1px solid black", Html.Attributes.style "text-align" "center", Html.Attributes.style "border-collapse" "collapse"]
 
@@ -155,12 +120,13 @@ solveTableStyle = [Html.Attributes.style "border" "1px solid black", Html.Attrib
 state : Int -> Model -> Html Msg
 state a model=
     case (a==1) of
+        --The "add item" initial screen
         True -> (div [ classes [ f1, pointer, b, pl3 ] ]
             [ -- `tachyons.css` this should only be used for demo pourposes, it's better included as a cdn in HTML: 
             -- <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
             tachyons.css 
-            ,div[classes [flex, justify_between]][
-                text "New Item"
+            ,div[classes [flex, justify_between]][             
+                text "New Item (0/1 Backpack Problem)"
                 ,button [onClick Reset] [text "Reset"]
 
             ]
@@ -202,43 +168,39 @@ state a model=
             
                 
             ])
+        --The solving screen
         False -> (div [ classes [ f1, pointer, b, pl3 ] ]
             [ -- `tachyons.css` this should only be used for demo pourposes, it's better included as a cdn in HTML: 
             -- <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
             tachyons.css 
             ,div[classes [flex, justify_between]][
-                text "Problem Solution"
+                text "0/1 Backpack Problem Solution"
                 ,button [onClick Reset] [text "Reset"]
 
             ]
-            ,div [classes [flex, flex_column]][
+            ,div [classes [flex, flex_column], Html.Attributes.style "font-weight" "normal"][
                 div [][text ("Values: " ++ (listToString model.values) )]
                 ,div [][text ("Weights: " ++ (listToString model.weights) )]
                 ,div [][text ("Max Weight: " ++ (String.fromInt model.maxWeight))]
             ]
-            --Old, text based outputs. 
-            --,div [][
-                --renderSolTable model.solveTable
-                --Html.pre []  [text (printTest model.solveTable 0 0)]
-            --]
             ,div []
-                --renderSolTable model.solveTable
                 [   
                     div [][text ("\n Solution table")]
                     ,table solveTableStyle (printSolTable model.solveTable 0)
                 ]
             -- displays active step           
-            ,div [][
+            ,div [Html.Attributes.style "font-weight" "normal"][
                 (if (Tuple.first(model.activeStep) > (Array2D.rows model.solveTable) - 1) then 
                     text ("Maximum possible value: " ++ String.fromInt((Maybe.Extra.unwrap 0 (test) (Array2D.get ((Array2D.rows model.solveTable) - 1) ((Array2D.columns model.solveTable) - 1) model.solveTable))))
-                else text ("Active Step: (" ++ String.fromInt(Tuple.first(model.activeStep)) ++ "," ++ String.fromInt(Tuple.second(model.activeStep)) ++ ")"))
+                else text ("Active Step(Item#, Weight): (" ++ String.fromInt(Tuple.first(model.activeStep)) ++ "," ++ String.fromInt(Tuple.second(model.activeStep)) ++ ")"))
             ]            
             ,div [][
                 button [onClick PrevStep, Html.Attributes.disabled (if (Tuple.first(model.activeStep) == 0 && Tuple.second(model.activeStep) == 0) then True else False)] [text "Previous Step"]
-               ,button [onClick NextStep, Html.Attributes.disabled (if (Tuple.first(model.activeStep) > (Array2D.rows model.solveTable) - 1) then True else False)] [text "Next Step"]  
+               ,button [ onClick NextStep, Html.Attributes.disabled (if (Tuple.first(model.activeStep) > (Array2D.rows model.solveTable) - 1) then True else False)] [text "Next Step"]  
             ]
-            ,div [][
-              button [onClick MagicButton] [text "Solve"]               
+            ,div [classes [pt5]][
+                button [ Html.Attributes.disabled (if (Tuple.first(model.activeStep) == 0 && Tuple.second(model.activeStep) == 0) then True else False)] [text "First Step"]
+                ,button [onClick MagicButton, Html.Attributes.disabled (if (Tuple.first(model.activeStep) > (Array2D.rows model.solveTable) - 1) then True else False)] [text "Solve"]               
             ]
             ])
         
@@ -336,6 +298,7 @@ update msg model=
         , values = List.reverse model.values
         , currentState = 2
         , solveTable = solveTableToArray (createSolveTable [] (List.length model.values + 1) (model.maxWeight + 1)  ) }
+    --Step functions
     PrevStep -> {model | 
          holderTable = if Array2D.isEmpty model.holderTable then zeroOneBackpack model.solveTable (Array.fromList model.values) (Array.fromList model.weights) model.maxWeight 0 0 else model.holderTable
          ,activeStep = if ((Tuple.second(model.activeStep) - 1) >= 0) then (Tuple.pair (Tuple.first(model.activeStep)) (Tuple.second(model.activeStep) - 1)) 
@@ -355,8 +318,8 @@ update msg model=
          ,activeStep = if (Tuple.second(model.activeStep) < ((Array2D.columns model.solveTable) - 1)) then (Tuple.pair (Tuple.first(model.activeStep)) (Tuple.second(model.activeStep) + 1)) 
                        else if  (Tuple.first(model.activeStep) < ((Array2D.rows model.solveTable) - 1)) then (Tuple.pair (Tuple.first(model.activeStep) + 1) 0)
                        else (Array2D.rows model.solveTable, 0)}
+    --Solve button
     MagicButton ->
-        --todo: make new state var, solved table
         {model | solveTable =  zeroOneBackpack model.solveTable (Array.fromList model.values) (Array.fromList model.weights) model.maxWeight 0 0
         ,holderTable = if Array2D.isEmpty model.holderTable then zeroOneBackpack model.solveTable (Array.fromList model.values) (Array.fromList model.weights) model.maxWeight 0 0 else model.holderTable
         ,activeStep = (Array2D.rows model.solveTable, 0)
