@@ -9,10 +9,10 @@ Compile with ```elm make src/Main.elm```, install dependencies with ```elm insta
 
 ## Dependencies/Versions
 ```json
+{
     "elm-version": "0.19.1",
     "dependencies": {
         "direct": {
-            "MacCASOutreach/graphicsvg": "7.1.0",
             "elm/browser": "1.0.2",
             "elm/core": "1.0.2",
             "elm/html": "1.0.0",
@@ -28,6 +28,9 @@ Compile with ```elm make src/Main.elm```, install dependencies with ```elm insta
             "elm/url": "1.0.0",
             "elm/virtual-dom": "1.0.2"
         }
+    }
+}
+
 ```
 
 ## Current functionality

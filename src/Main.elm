@@ -374,7 +374,7 @@ type alias Model =
     , table: List (Html Msg)
     , maxWeight: Int
     , currentState: Int
-    , holderTable: Array2D.Array2D Int --"holds" solution for step by step for assignment
+    , holderTable: Array2D.Array2D Int --"holds" solution for step by step
     , solveTable: Array2D.Array2D Int--solveTable: List(List(Int))
     , i: Int
     , j: Int
