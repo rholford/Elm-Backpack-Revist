@@ -1,4 +1,6 @@
 module Main exposing (..)
+--Revist of backpack problem code
+--Repo @ https://github.com/rholford/Elm-Backpack-Revist
 
 --HTML imports
 import Browser
@@ -17,6 +19,7 @@ import Array2D
 import Maybe.Extra
 import List
 import List.Extra 
+import Tuple
 
 
 
@@ -91,11 +94,12 @@ printTest inp row col =
 --Keeps allignment unlike string, looks better
 --Note that Item 0 (W,V = 0,0) and Weight 0 are that base cases for the algorithim's 'lookback' steps, and will always be 0.
 --removed col int, might be useful to re-add it for interactions with table elements
-printSolTable : Array2D.Array2D Int -> Int -> List (Html Msg) 
-printSolTable inp row =
+
+printSolTable : Array2D.Array2D Int -> Int -> (Int, Int) -> List(Html Msg) 
+printSolTable inp row active =
     case (row == ((Array2D.rows inp) - 1)) of
-        False -> [Html.tr solveTableStyle (columnHelper (Array.toList(Maybe.Extra.unwrap Array.empty arrayUnwrap (Array2D.getRow row inp))) 0)] ++ printSolTable inp (row+1)
-        True -> [Html.tr solveTableStyle (columnHelper (Array.toList(Maybe.Extra.unwrap Array.empty arrayUnwrap (Array2D.getRow row inp))) 0)]
+        False -> [Html.tr solveTableStyle (columnHelper (Array.toList(Maybe.Extra.unwrap Array.empty arrayUnwrap (Array2D.getRow row inp))) row 0 active)] ++ printSolTable inp (row+1) active
+        True -> [Html.tr solveTableStyle (columnHelper (Array.toList(Maybe.Extra.unwrap Array.empty arrayUnwrap (Array2D.getRow row inp))) row 0 active)]
 --Failed attempt
  --if (col == 0) then [Html.tr [] ((td[] [(text (String.fromInt (Maybe.Extra.unwrap 0 (test) (Array2D.get row col inp))))])::(printSolTable inp row (col+1)))]
   --else if (col < ((Array2D.columns inp)- 1)) then ((td[] [(text (String.fromInt (Maybe.Extra.unwrap 0 (test) (Array2D.get row col inp))))])::(printSolTable inp row (col+1)))
@@ -104,12 +108,20 @@ printSolTable inp row =
 --Html.tr []
 
 --Helper function to print out solution columns into html table
-columnHelper : List Int -> Int -> List(Html Msg)
-columnHelper inp col = 
+columnHelper : List Int -> Int -> Int -> (Int, Int) -> List(Html Msg)
+columnHelper inp row col active = 
     case inp of
         [] -> [Html.text ""]
-        (x::[]) -> [Html.td ([classes [pl2, pr5]] ++ solveTableStyle) [ (text (String.fromInt x)) ]]
-        (x::xs) -> [Html.td ([classes [pl2, pr5]] ++ solveTableStyle) [ (text (String.fromInt x)) ]] ++ columnHelper xs (col+1)
+        (x::[]) -> [Html.td ([classes [pl2, pr5]] ++ solveTableStyle ++
+                    [(if ((row == Tuple.first(active)) && (col == Tuple.second(active))) then Html.Attributes.style "background-color" "#FFFF66" 
+                    else if ( ((row == Tuple.first(active)) && (col == (Tuple.second(active) - 1)))) then Html.Attributes.style "background-color" "lightgreen" 
+                    else if ((Tuple.second(active) == 0) && ((row == (Tuple.first active) - 1)))then Html.Attributes.style "background-color" "lightgreen" 
+                    else Html.Attributes.style "background-color" "white")]) [ (text (String.fromInt x)) ]]
+        (x::xs) -> [Html.td ([classes [pl2, pr5]] ++ solveTableStyle ++ 
+                    [(if ((row == Tuple.first(active)) && (col == Tuple.second(active))) then Html.Attributes.style "background-color" "#FFFF66"
+                    else if (((row == Tuple.first(active)) && (col == (Tuple.second(active)-1)))) then Html.Attributes.style "background-color" "lightgreen" 
+                    else if ((Tuple.second(active) == 0) && ((row == (Tuple.first active) - 1)))then Html.Attributes.style "background-color" "lightgreen" 
+                    else Html.Attributes.style "background-color" "white")]) [ (text (String.fromInt x)) ]] ++ columnHelper xs row (col+1) active
         
 
 solveTableStyle : List (Html.Attribute msg)
@@ -187,8 +199,9 @@ state a model=
             ]
             ,div []
                 [   
-                    div [][text ("\n Solution table")]
-                    ,table solveTableStyle (printSolTable model.solveTable 0)
+                    div [classes[pt5]][text ("Solution table")]
+                    ,div [classes[pl7], Html.Attributes.style "font-weight" "normal"][text ("Weights 0.." ++ String.fromInt(model.maxWeight) )]
+                    ,div[classes [flex, flex_row], Html.Attributes.style "font-weight" "normal"][div [classes[pr3]] [text "Items  "], table solveTableStyle (printSolTable model.solveTable 0 model.activeStep)]
                 ]
             -- displays active step           
             ,div [Html.Attributes.style "font-weight" "normal"][

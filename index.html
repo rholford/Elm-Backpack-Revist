@@ -6558,6 +6558,7 @@ var $justgage$tachyons_elm$Tachyons$Classes$f2 = 'f2';
 var $justgage$tachyons_elm$Tachyons$Classes$f4 = 'f4';
 var $justgage$tachyons_elm$Tachyons$Classes$flex = 'flex';
 var $justgage$tachyons_elm$Tachyons$Classes$flex_column = 'flex-column';
+var $justgage$tachyons_elm$Tachyons$Classes$flex_row = 'flex-row';
 var $justgage$tachyons_elm$Tachyons$Classes$justify_between = 'justify-between';
 var $author$project$Main$listToString = function (l) {
 	if (!l.b) {
@@ -6593,6 +6594,7 @@ var $elm$html$Html$Events$onClick = function (msg) {
 var $justgage$tachyons_elm$Tachyons$Classes$pb2 = 'pb2';
 var $justgage$tachyons_elm$Tachyons$Classes$pl3 = 'pl3';
 var $justgage$tachyons_elm$Tachyons$Classes$pl5 = 'pl5';
+var $justgage$tachyons_elm$Tachyons$Classes$pl7 = 'pl7';
 var $justgage$tachyons_elm$Tachyons$Classes$pointer = 'pointer';
 var $justgage$tachyons_elm$Tachyons$Classes$pr3 = 'pr3';
 var $author$project$Main$arrayUnwrap = function (lst) {
@@ -6606,8 +6608,8 @@ var $author$project$Main$solveTableStyle = _List_fromArray(
 		A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
 		A2($elm$html$Html$Attributes$style, 'border-collapse', 'collapse')
 	]);
-var $author$project$Main$columnHelper = F2(
-	function (inp, col) {
+var $author$project$Main$columnHelper = F4(
+	function (inp, row, col, active) {
 		if (!inp.b) {
 			return _List_fromArray(
 				[
@@ -6627,7 +6629,12 @@ var $author$project$Main$columnHelper = F2(
 									_List_fromArray(
 										[$justgage$tachyons_elm$Tachyons$Classes$pl2, $justgage$tachyons_elm$Tachyons$Classes$pr5]))
 								]),
-							$author$project$Main$solveTableStyle),
+							_Utils_ap(
+								$author$project$Main$solveTableStyle,
+								_List_fromArray(
+									[
+										(_Utils_eq(row, active.a) && _Utils_eq(col, active.b)) ? A2($elm$html$Html$Attributes$style, 'background-color', '#FFFF66') : ((_Utils_eq(row, active.a) && _Utils_eq(col, active.b - 1)) ? A2($elm$html$Html$Attributes$style, 'background-color', 'lightgreen') : (((!active.b) && _Utils_eq(row, active.a - 1)) ? A2($elm$html$Html$Attributes$style, 'background-color', 'lightgreen') : A2($elm$html$Html$Attributes$style, 'background-color', 'white')))
+									]))),
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
@@ -6649,19 +6656,24 @@ var $author$project$Main$columnHelper = F2(
 										_List_fromArray(
 											[$justgage$tachyons_elm$Tachyons$Classes$pl2, $justgage$tachyons_elm$Tachyons$Classes$pr5]))
 									]),
-								$author$project$Main$solveTableStyle),
+								_Utils_ap(
+									$author$project$Main$solveTableStyle,
+									_List_fromArray(
+										[
+											(_Utils_eq(row, active.a) && _Utils_eq(col, active.b)) ? A2($elm$html$Html$Attributes$style, 'background-color', '#FFFF66') : ((_Utils_eq(row, active.a) && _Utils_eq(col, active.b - 1)) ? A2($elm$html$Html$Attributes$style, 'background-color', 'lightgreen') : (((!active.b) && _Utils_eq(row, active.a - 1)) ? A2($elm$html$Html$Attributes$style, 'background-color', 'lightgreen') : A2($elm$html$Html$Attributes$style, 'background-color', 'white')))
+										]))),
 							_List_fromArray(
 								[
 									$elm$html$Html$text(
 									$elm$core$String$fromInt(x))
 								]))
 						]),
-					A2($author$project$Main$columnHelper, xs, col + 1));
+					A4($author$project$Main$columnHelper, xs, row, col + 1, active));
 			}
 		}
 	});
-var $author$project$Main$printSolTable = F2(
-	function (inp, row) {
+var $author$project$Main$printSolTable = F3(
+	function (inp, row, active) {
 		var _v0 = _Utils_eq(
 			row,
 			$tortus$elm_array_2d$Array2D$rows(inp) - 1);
@@ -6672,7 +6684,7 @@ var $author$project$Main$printSolTable = F2(
 						A2(
 						$elm$html$Html$tr,
 						$author$project$Main$solveTableStyle,
-						A2(
+						A4(
 							$author$project$Main$columnHelper,
 							$elm$core$Array$toList(
 								A3(
@@ -6680,16 +6692,18 @@ var $author$project$Main$printSolTable = F2(
 									$elm$core$Array$empty,
 									$author$project$Main$arrayUnwrap,
 									A2($tortus$elm_array_2d$Array2D$getRow, row, inp))),
-							0))
+							row,
+							0,
+							active))
 					]),
-				A2($author$project$Main$printSolTable, inp, row + 1));
+				A3($author$project$Main$printSolTable, inp, row + 1, active));
 		} else {
 			return _List_fromArray(
 				[
 					A2(
 					$elm$html$Html$tr,
 					$author$project$Main$solveTableStyle,
-					A2(
+					A4(
 						$author$project$Main$columnHelper,
 						$elm$core$Array$toList(
 							A3(
@@ -6697,7 +6711,9 @@ var $author$project$Main$printSolTable = F2(
 								$elm$core$Array$empty,
 								$author$project$Main$arrayUnwrap,
 								A2($tortus$elm_array_2d$Array2D$getRow, row, inp))),
-						0))
+						row,
+						0,
+						active))
 				]);
 		}
 	});
@@ -7124,15 +7140,58 @@ var $author$project$Main$state = F2(
 							[
 								A2(
 								$elm$html$Html$div,
-								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('\n Solution table')
+										$justgage$tachyons_elm$Tachyons$classes(
+										_List_fromArray(
+											[$justgage$tachyons_elm$Tachyons$Classes$pt5]))
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Solution table')
 									])),
 								A2(
-								$elm$html$Html$table,
-								$author$project$Main$solveTableStyle,
-								A2($author$project$Main$printSolTable, model.solveTable, 0))
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$justgage$tachyons_elm$Tachyons$classes(
+										_List_fromArray(
+											[$justgage$tachyons_elm$Tachyons$Classes$pl7])),
+										A2($elm$html$Html$Attributes$style, 'font-weight', 'normal')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										'Weights 0..' + $elm$core$String$fromInt(model.maxWeight))
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$justgage$tachyons_elm$Tachyons$classes(
+										_List_fromArray(
+											[$justgage$tachyons_elm$Tachyons$Classes$flex, $justgage$tachyons_elm$Tachyons$Classes$flex_row])),
+										A2($elm$html$Html$Attributes$style, 'font-weight', 'normal')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$justgage$tachyons_elm$Tachyons$classes(
+												_List_fromArray(
+													[$justgage$tachyons_elm$Tachyons$Classes$pr3]))
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Items  ')
+											])),
+										A2(
+										$elm$html$Html$table,
+										$author$project$Main$solveTableStyle,
+										A3($author$project$Main$printSolTable, model.solveTable, 0, model.activeStep))
+									]))
 							])),
 						A2(
 						$elm$html$Html$div,

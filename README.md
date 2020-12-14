@@ -1,7 +1,11 @@
 # Elm-Backpack-Revist
 Revisit of DT project.
+
 Original Code: Group 15, Fall 2019.
+
 Initial Commit: Clone of old code, version submitted via avenue.
+
+Compile with ```elm make src/Main.elm```, install dependencies with ```elm install <mising pacakge>```
 
 ## Dependencies/Versions
 ```json
@@ -51,13 +55,15 @@ File cleanup.
 
 Minor tweaks to various CSS related visual bits.
 
+Added new buttons, first step and back.
+
+Added colouring to table steps. Some text/format tweaks.
+
 ## Ideas?
 
-More buttons?
+Find the back/solve again bug.
 
-More table tweaks? 
-
-Is interactivity possible/practical? 
+Is more interactivity practical? 
 
 NOTE: IF WHEN COMPILING IT GIVES VERSION ERROR, EITHER UPDATE OR BOOTLEG IT BY GOING INTO THE .json AND MODIFYING THE VERSION
 
