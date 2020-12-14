@@ -59,9 +59,11 @@ Added new buttons, first step and back.
 
 Added colouring to table steps. Some text/format tweaks.
 
+Fixed an issue with back button.
+
 ## Ideas?
 
-Find the back/solve again bug.
+More algo related info?
 
 Is more interactivity practical? 
 
