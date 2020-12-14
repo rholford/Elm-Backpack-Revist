@@ -5308,6 +5308,7 @@ var $author$project$Main$initModel = {
 	currentState: 1,
 	holderTable: $tortus$elm_array_2d$Array2D$fromList(_List_Nil),
 	i: 0,
+	itemNameCount: 1,
 	j: 0,
 	maxWeight: 1,
 	one: 1,
@@ -6258,6 +6259,7 @@ var $author$project$Main$update = F2(
 				return _Utils_update(
 					model,
 					{
+						itemNameCount: model.itemNameCount + 1,
 						one: 1,
 						table: $elm$core$List$reverse(
 							A2(
@@ -6278,8 +6280,7 @@ var $author$project$Main$update = F2(
 											_List_fromArray(
 												[
 													$elm$html$Html$text(
-													'Item' + $elm$core$String$fromInt(
-														$elm$core$List$length(model.table)))
+													'Item' + $elm$core$String$fromInt(model.itemNameCount))
 												])),
 											A2(
 											$elm$html$Html$td,
@@ -6349,6 +6350,7 @@ var $author$project$Main$update = F2(
 						activeStep: _Utils_Tuple2(0, 0),
 						currentState: 1,
 						holderTable: $tortus$elm_array_2d$Array2D$fromList(_List_Nil),
+						itemNameCount: 1,
 						maxWeight: 1,
 						one: 1,
 						removePos: 1,
@@ -6402,6 +6404,18 @@ var $author$project$Main$update = F2(
 						two: 1,
 						values: _List_Nil,
 						weights: _List_Nil
+					});
+			case 'Back':
+				return _Utils_update(
+					model,
+					{
+						activeStep: _Utils_Tuple2(0, 0),
+						currentState: 1,
+						holderTable: $tortus$elm_array_2d$Array2D$fromList(_List_Nil),
+						one: 1,
+						removePos: 1,
+						solveTable: $tortus$elm_array_2d$Array2D$fromList(_List_Nil),
+						two: 1
 					});
 			case 'Submit':
 				return _Utils_update(
@@ -6511,6 +6525,7 @@ var $author$project$Main$update = F2(
 		}
 	});
 var $author$project$Main$AddItem = {$: 'AddItem'};
+var $author$project$Main$Back = {$: 'Back'};
 var $author$project$Main$Decrement = {$: 'Decrement'};
 var $author$project$Main$Decrement2 = {$: 'Decrement2'};
 var $author$project$Main$FirstStep = {$: 'FirstStep'};
@@ -7040,14 +7055,30 @@ var $author$project$Main$state = F2(
 							[
 								$elm$html$Html$text('0/1 Backpack Problem Solution'),
 								A2(
-								$elm$html$Html$button,
+								$elm$html$Html$div,
+								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$Events$onClick($author$project$Main$Reset)
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Reset')
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$elm$html$Html$Events$onClick($author$project$Main$Back)
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Back')
+											])),
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$elm$html$Html$Events$onClick($author$project$Main$Reset)
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Reset')
+											]))
 									]))
 							])),
 						A2(

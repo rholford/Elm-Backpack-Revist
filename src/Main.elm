@@ -21,7 +21,7 @@ import List.Extra
 
 
 -- Defines all types of msgs that can be sent to the update function
-type Msg = Increment | Decrement | Increment2 | Decrement2 | AddItem | RemoveItem | MaxUp | MaxDown | Reset | Submit | NextStep | PrevStep | MagicButton | FirstStep | RemovePosIncr | RemovePosDecr
+type Msg = Increment | Decrement | Increment2 | Decrement2 | AddItem | RemoveItem | MaxUp | MaxDown | Reset | Back | Submit | NextStep | PrevStep | MagicButton | FirstStep | RemovePosIncr | RemovePosDecr
 
 -- Converts a list if items to a comma seperated list
 listToString : (List Int) -> String
@@ -175,7 +175,9 @@ state a model=
             tachyons.css 
             ,div[classes [flex, justify_between]][
                 text "0/1 Backpack Problem Solution"
-                ,button [onClick Reset] [text "Reset"]
+                ,div[][button [onClick Back] [text "Back"]
+                      ,button [onClick Reset] [text "Reset"]
+                ]               
 
             ]
             ,div [classes [flex, flex_column], Html.Attributes.style "font-weight" "normal"][
@@ -247,12 +249,13 @@ update msg model=
         {model | weights = model.two :: model.weights
         , values = model.one :: model.values
         , table = List.reverse((Html.tr []
-                        [ td [classes [pl2, pr5]] [text ("Item" ++ (String.fromInt (List.length model.table)))]
+                        [ td [classes [pl2, pr5]] [text ("Item" ++ (String.fromInt model.itemNameCount))] --Old method (List.length model.table) doubled after deleting
                         , td [classes [pr6]] [text (String.fromInt model.one)]
                         , td [classes [pl4]] [text (String.fromInt model.two)]
                         ]) :: List.reverse model.table)
         , one = 1
         , two = 1
+        , itemNameCount = model.itemNameCount + 1
         }
     
     --Removes an item
@@ -291,7 +294,18 @@ update msg model=
         , activeStep = (0,0)
         , solveTable = Array2D.fromList []
         , holderTable = Array2D.fromList []
+        , itemNameCount = 1
         }
+    --Goes back to previous page without resetting item list
+    Back ->
+        {model | one = 1
+        , two = 1
+        , removePos = 1
+        , currentState = 1
+        , activeStep = (0,0)
+        , solveTable = Array2D.fromList []
+        , holderTable = Array2D.fromList []
+        }        
     --updates the model to show the solution screen
     Submit ->
         {model | weights = List.reverse model.weights
@@ -345,11 +359,12 @@ type alias Model =
     , table: List (Html Msg)
     , maxWeight: Int
     , currentState: Int
-    , holderTable : Array2D.Array2D Int --"holds" solution for step by step for assignment
+    , holderTable: Array2D.Array2D Int --"holds" solution for step by step for assignment
     , solveTable: Array2D.Array2D Int--solveTable: List(List(Int))
     , i: Int
     , j: Int
     , activeStep: (Int, Int) --position x,y 
+    , itemNameCount: Int
     }
 
 --sets the initial model values
@@ -378,6 +393,7 @@ initModel =
     , i = 0
     , j = 0
     , activeStep = (0, 0)
+    , itemNameCount = 1
     }
 --starts the view of the webpage
 main = 
