@@ -6470,7 +6470,7 @@ var $author$project$Main$update = F2(
 								A3($tortus$elm_array_2d$Array2D$get, model.activeStep.a, model.activeStep.b, model.holderTable)),
 							model.solveTable)
 					});
-			default:
+			case 'MagicButton':
 				return _Utils_update(
 					model,
 					{
@@ -6496,11 +6496,24 @@ var $author$project$Main$update = F2(
 							0,
 							0)
 					});
+			default:
+				return _Utils_update(
+					model,
+					{
+						activeStep: _Utils_Tuple2(0, 0),
+						solveTable: $author$project$Main$solveTableToArray(
+							A3(
+								$author$project$Main$createSolveTable,
+								_List_Nil,
+								$elm$core$List$length(model.values) + 1,
+								model.maxWeight + 1))
+					});
 		}
 	});
 var $author$project$Main$AddItem = {$: 'AddItem'};
 var $author$project$Main$Decrement = {$: 'Decrement'};
 var $author$project$Main$Decrement2 = {$: 'Decrement2'};
+var $author$project$Main$FirstStep = {$: 'FirstStep'};
 var $author$project$Main$Increment = {$: 'Increment'};
 var $author$project$Main$Increment2 = {$: 'Increment2'};
 var $author$project$Main$MagicButton = {$: 'MagicButton'};
@@ -7159,6 +7172,7 @@ var $author$project$Main$state = F2(
 								$elm$html$Html$button,
 								_List_fromArray(
 									[
+										$elm$html$Html$Events$onClick($author$project$Main$FirstStep),
 										$elm$html$Html$Attributes$disabled(
 										((!model.activeStep.a) && (!model.activeStep.b)) ? true : false)
 									]),

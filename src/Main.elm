@@ -21,7 +21,7 @@ import List.Extra
 
 
 -- Defines all types of msgs that can be sent to the update function
-type Msg = Increment | Decrement | Increment2 | Decrement2 | AddItem | RemoveItem | MaxUp | MaxDown | Reset | Submit | NextStep | PrevStep | MagicButton | RemovePosIncr | RemovePosDecr
+type Msg = Increment | Decrement | Increment2 | Decrement2 | AddItem | RemoveItem | MaxUp | MaxDown | Reset | Submit | NextStep | PrevStep | MagicButton | FirstStep | RemovePosIncr | RemovePosDecr
 
 -- Converts a list if items to a comma seperated list
 listToString : (List Int) -> String
@@ -196,10 +196,10 @@ state a model=
             ]            
             ,div [][
                 button [onClick PrevStep, Html.Attributes.disabled (if (Tuple.first(model.activeStep) == 0 && Tuple.second(model.activeStep) == 0) then True else False)] [text "Previous Step"]
-               ,button [ onClick NextStep, Html.Attributes.disabled (if (Tuple.first(model.activeStep) > (Array2D.rows model.solveTable) - 1) then True else False)] [text "Next Step"]  
+               ,button [onClick NextStep, Html.Attributes.disabled (if (Tuple.first(model.activeStep) > (Array2D.rows model.solveTable) - 1) then True else False)] [text "Next Step"]  
             ]
             ,div [classes [pt5]][
-                button [ Html.Attributes.disabled (if (Tuple.first(model.activeStep) == 0 && Tuple.second(model.activeStep) == 0) then True else False)] [text "First Step"]
+                button [onClick FirstStep, Html.Attributes.disabled (if (Tuple.first(model.activeStep) == 0 && Tuple.second(model.activeStep) == 0) then True else False)] [text "First Step"]
                 ,button [onClick MagicButton, Html.Attributes.disabled (if (Tuple.first(model.activeStep) > (Array2D.rows model.solveTable) - 1) then True else False)] [text "Solve"]               
             ]
             ])
@@ -324,7 +324,12 @@ update msg model=
         ,holderTable = if Array2D.isEmpty model.holderTable then zeroOneBackpack model.solveTable (Array.fromList model.values) (Array.fromList model.weights) model.maxWeight 0 0 else model.holderTable
         ,activeStep = (Array2D.rows model.solveTable, 0)
         ,i = List.length (model.values) + 1 --symbolic update to last position?
-        ,j = List.length (model.weights) + 1 }  --zeroOneBackpack model.solveTable vi wi bigW 0 0       
+        ,j = List.length (model.weights) + 1 }  --zeroOneBackpack model.solveTable vi wi bigW 0 0
+
+    --Returns to the first step of the solution
+    FirstStep ->
+        {model | solveTable = solveTableToArray (createSolveTable [] (List.length model.values + 1) (model.maxWeight + 1)  ) 
+        ,activeStep = (0,0)}
 
         
 --sets the model of the view
